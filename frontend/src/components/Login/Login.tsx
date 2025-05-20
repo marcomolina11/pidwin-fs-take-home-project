@@ -39,7 +39,6 @@ const Login: React.FC = () => {
   useEffect(() => {
     if (user !== null) {
       history('/');
-      console.log('navigating to home page');
     }
   }, [user, history]);
 

@@ -43,8 +43,8 @@ export const changePassword =
     try {
       const { data } = await api.changePassword(formData);
       dispatch({ type: LOGOUT, data });
-      messages.success('Password Change Was Successful');
       history('/');
+      messages.success('Password Change Was Successful');
     } catch (error: any) {
       messages.error(error.response?.data?.message || 'Password change failed');
     }
