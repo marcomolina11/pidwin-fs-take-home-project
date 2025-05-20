@@ -54,4 +54,5 @@ export interface UserData {
   password: string;
   exp?: number;
   picture?: string;
+  tokens: number;
 }

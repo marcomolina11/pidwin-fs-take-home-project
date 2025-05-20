@@ -14,7 +14,6 @@ const Navbar: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
 
   const dispatch = useDispatch<ThunkDispatch<any, any, AnyAction>>();
-  //const location = useLocation();
   const history = useNavigate();
 
   const logout = useCallback(() => {
@@ -45,7 +44,7 @@ const Navbar: React.FC = () => {
         {user !== null ? (
           <div style={styles.profile}>
             <Typography sx={styles.userName} variant="h6">
-              Tokens: 100
+              {`Tokens: ${user.tokens}`}
             </Typography>
             <Avatar sx={styles.purple} alt={user.name} src={user.picture}>
               {user.name.charAt(0)}

@@ -7,6 +7,7 @@ export interface UserDocument {
   email: string;
   password: string;
   id?: string;
+  token: number;
 }
 
 export interface LoginRequest {

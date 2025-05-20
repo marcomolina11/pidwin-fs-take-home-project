@@ -1,28 +1,24 @@
 import React from 'react';
-import { Container, Grow, Paper, Typography } from '@mui/material';
-import { jwtDecode } from 'jwt-decode';
+import {
+  Avatar,
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Typography,
+} from '@mui/material';
+import CasinoIcon from '@mui/icons-material/Casino';
+import Input from '../Login/Input';
 import { UserData } from '../../types/actionTypes';
+import { styles } from './styles';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../selectors/authSelectors';
 
 const Home: React.FC = () => {
-  // Checking if the user is logged in by checking the localStorage is done the same way in all components (Login, Home, etc.)
-  // TODO: Refactor this to a custom hook
-  let user: UserData | null = null;
-
-  try {
-    const profileStr = localStorage.getItem('profile');
-    if (profileStr) {
-      const profile = JSON.parse(profileStr);
-      if (profile?.token) {
-        user = jwtDecode<UserData>(profile.token);
-      }
-    }
-  } catch (error) {
-    console.error('Error parsing profile from localStorage:', error);
-    user = null;
-  }
+  const user: UserData | null = useSelector(selectUser);
 
   return (
-    <Grow in>
+    <div>
       <Container component="main" maxWidth="sm">
         <Paper elevation={3}>
           {user !== null ? (
@@ -35,8 +31,43 @@ const Home: React.FC = () => {
             </Typography>
           )}
         </Paper>
+        <Paper sx={styles.paper} elevation={3}>
+          <Avatar sx={styles.avatar}>
+            <CasinoIcon />
+          </Avatar>
+          <Typography variant="h5" color="primary">
+            Lucky 7
+          </Typography>
+          <form style={styles.form} onSubmit={() => {}}>
+            <Grid container spacing={2}>
+              <Typography
+                variant="caption"
+                color="info"
+                sx={styles.typo}
+                align="center"
+              >
+                Set your wager for a chance to win!
+              </Typography>
+              <Input
+                name="wager"
+                label="Your Wager"
+                handleChange={() => {}}
+                type="number"
+              />
+              <Button
+                type="submit"
+                sx={styles.submit}
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                Submit Wager
+              </Button>
+            </Grid>
+          </form>
+        </Paper>
       </Container>
-    </Grow>
+    </div>
   );
 };
 
