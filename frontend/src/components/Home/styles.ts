@@ -10,11 +10,6 @@ interface StylesInterface {
   userName: SxProps<Theme>;
   brandContainer: React.CSSProperties;
   purple: SxProps<Theme>;
-  paper: SxProps<Theme>;
-  avatar: SxProps<Theme>;
-  form: React.CSSProperties;
-  submit: SxProps<Theme>;
-  typo: SxProps<Theme>;
 }
 
 export const styles: StylesInterface = {
@@ -52,26 +47,5 @@ export const styles: StylesInterface = {
   purple: {
     color: theme.palette.getContrastText(deepPurple[500]),
     backgroundColor: deepPurple[500],
-  },
-  paper: {
-    marginTop: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: theme.spacing(2),
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: '#673ab7',
-  },
-  form: {
-    width: '100%',
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 1, 2),
-  },
-  typo: {
-    margin: theme.spacing(3, 3, 2),
   },
 };

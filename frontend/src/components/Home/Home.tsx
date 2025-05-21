@@ -3,6 +3,7 @@ import { Container, Paper, Typography } from '@mui/material';
 import { UserData } from '../../types/actionTypes';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../selectors/authSelectors';
+import GameForm from '../GameForm/GameForm';
 
 const Home: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
@@ -21,6 +22,7 @@ const Home: React.FC = () => {
             </Typography>
           )}
         </Paper>
+        <GameForm />
       </Container>
     </div>
   );

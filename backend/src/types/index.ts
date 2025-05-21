@@ -1,13 +1,15 @@
 import { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
+import mongoose, { Document } from 'mongoose';
 
 export interface UserDocument {
   _id: string;
   name: string;
   email: string;
   password: string;
-  id?: string;
   tokens: number;
+  currentWinStreak: number;
+  highestWinStreak: number;
 }
 
 export interface LoginRequest {
@@ -38,4 +40,23 @@ export interface UserJwtPayload extends JwtPayload {
 
 export interface AuthRequest extends Request {
   userId?: string;
+}
+
+export interface GameDocument extends Document {
+  isComplete: boolean;
+  dice1?: number;
+  dice2?: number;
+  createdAt: Date;
+  bets: mongoose.Types.ObjectId[];
+  canAcceptBets: boolean;
+  rollResult?: number;
+  isLuckySeven?: boolean;
+}
+
+export interface BetDocument extends Document {
+  user: mongoose.Types.ObjectId;
+  game: mongoose.Types.ObjectId;
+  amount: number;
+  isLuckySeven: boolean;
+  result: 'win' | 'lose';
 }
