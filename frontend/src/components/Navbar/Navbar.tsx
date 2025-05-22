@@ -35,6 +35,18 @@ const Navbar: React.FC = () => {
     }
   }, [user, logout]);
 
+  // Function to get user initials or placeholder
+  const getUserInitials = () => {
+    if (!user || !user.name) return '?'; // Safe fallback
+
+    // Now we can safely access user.name
+    const nameParts = user.name.split(' ');
+    if (nameParts.length >= 2) {
+      return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`.toUpperCase();
+    }
+    return user.name.charAt(0).toUpperCase();
+  };
+
   return (
     <AppBar sx={styles.appBar} position="static" color="inherit">
       <div style={styles.brandContainer}>
@@ -69,7 +81,7 @@ const Navbar: React.FC = () => {
               {`Tokens: ${user.tokens}`}
             </Typography>
             <Avatar sx={styles.purple} alt={user.name} src={user.picture}>
-              {user.name.charAt(0)}
+              {getUserInitials()}
             </Avatar>
             <Typography sx={styles.userName} variant="h6">
               {user.name}

@@ -10,18 +10,25 @@ import Home from './components/Home/Home';
 import PasswordSetting from './components/PasswordSettings/PasswordSettings';
 import WinStreaks from './components/WinStreaks/WinStreaks';
 import socketService from './services/socketService';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, useStore } from 'react-redux';
 import { selectIsAuthenticated } from './selectors/authSelectors';
+import { RootState } from './types/store';
+import { AnyAction } from 'redux';
+import { ThunkDispatch } from 'redux-thunk';
 
 const App: React.FC = () => {
   const { loading } = useDataRefresh();
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<ThunkDispatch<RootState, unknown, AnyAction>>();
+  const store = useStore<RootState>();
 
   // Initialize socket when user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      socketService.initialize(dispatch);
+      socketService.initialize(
+        dispatch as (action: AnyAction) => void,
+        store.getState
+      );
     } else {
       socketService.disconnect();
     }
@@ -30,7 +37,7 @@ const App: React.FC = () => {
     return () => {
       socketService.disconnect();
     };
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, dispatch, store]);
 
   if (loading) {
     return (

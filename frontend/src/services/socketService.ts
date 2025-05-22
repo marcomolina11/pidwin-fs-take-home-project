@@ -1,23 +1,32 @@
 import { io, Socket } from 'socket.io-client';
 import { addGameResult } from '../actions/game';
+import { UPDATE_USER } from '../constants/actionTypes';
 import { AnyAction } from 'redux';
+import { RootState } from '../types/store';
 
 class SocketService {
   private socket: Socket | null = null;
   private connected: boolean = false;
   private dispatch: ((action: AnyAction) => void) | null = null;
+  private getState: (() => RootState) | null = null;
 
-  // Initialize the socket connection
-  initialize(dispatch?: (action: AnyAction) => void): void {
+  // Initialize the socket connection (pass both dispatch and getState)
+  initialize(
+    dispatch?: (action: AnyAction) => void,
+    getState?: () => RootState
+  ): void {
     if (this.connected) return;
-    
-    // Store the dispatch function if provided
+
     if (dispatch) {
       this.dispatch = dispatch;
     }
 
+    if (getState) {
+      this.getState = getState;
+    }
+
     this.socket = io('http://localhost:8000');
-    
+
     this.socket.on('connect', () => {
       console.log('Socket connected');
       this.connected = true;
@@ -28,22 +37,35 @@ class SocketService {
       this.connected = false;
     });
 
-    // Set up global listeners
     this.setupListeners();
   }
 
-  // Set up event listeners that dispatch to Redux
   private setupListeners(): void {
     if (!this.socket) return;
 
-    // Game result listener
     this.socket.on('gameResult', (gameResult) => {
-      if (this.dispatch) {
+      if (this.dispatch && this.getState) {
+        // Dispatch game result
         this.dispatch(addGameResult(gameResult));
+
+        // Get current user from state
+        const state = this.getState();
+        const currentUser = state.auth.user;
+
+        // If user is logged in and affected by this game result
+        if (
+          currentUser &&
+          gameResult.affectedUsers &&
+          gameResult.affectedUsers[currentUser._id]
+        ) {
+          // Update user data in store
+          this.dispatch({
+            type: UPDATE_USER,
+            payload: gameResult.affectedUsers[currentUser._id],
+          });
+        }
       }
     });
-
-    // Add more event listeners here as needed
   }
 
   // Disconnect the socket
@@ -60,7 +82,7 @@ class SocketService {
     return this.connected;
   }
 
-  // Get the socket instance (in case components need direct access)
+  // Get the socket instance
   getSocket(): Socket | null {
     return this.socket;
   }

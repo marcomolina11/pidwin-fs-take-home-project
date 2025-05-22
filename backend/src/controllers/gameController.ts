@@ -48,7 +48,7 @@ export const startGameCycle = async () => {
         console.log('Dice roll results:', dice1, dice2, `(${rollResult})`);
 
         // Process all bets for this game
-        const userResults = await processBetsForGame(
+        const { userResults, affectedUsers } = await processBetsForGame(
           updatedGame._id.toString(),
           isLuckySeven
         );
@@ -62,6 +62,7 @@ export const startGameCycle = async () => {
           isLuckySeven, // Use the virtual property
           timestamp: updatedGame.createdAt,
           userResults,
+          affectedUsers,
         });
 
         // Create new game
@@ -85,12 +86,13 @@ export const startGameCycle = async () => {
 // Process all bets for a completed game
 async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
   try {
-    // Find all bets for this game WITHOUT populating user
+    // Find all bets for this game
     const bets = await Bet.find({ game: gameId });
     console.log(`Processing ${bets.length} bets for game ${gameId}`);
 
     // Store bet results for each user
     const userResults = new Map();
+    const affectedUsers = new Map();
 
     for (const bet of bets) {
       // Determine win/lose
@@ -107,10 +109,11 @@ async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
       const userId = bet.user.toString();
 
       // Update user tokens and streaks
+      let updatedUser;
       if (isWin) {
-        await updateUserForWin(userId, payout);
+        updatedUser = await updateUserForWin(userId, payout);
       } else {
-        await updateUserForLoss(userId);
+        updatedUser = await updateUserForLoss(userId);
       }
 
       // Store this user's result
@@ -118,13 +121,26 @@ async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
         userId: userId,
         result: result,
       });
+
+      // Store updated user data for frontend
+      if (updatedUser) {
+        affectedUsers.set(userId, {
+          _id: userId,
+          tokens: updatedUser.tokens,
+          currentWinStreak: updatedUser.currentWinStreak,
+          highestWinStreak: updatedUser.highestWinStreak,
+        });
+      }
     }
 
-    // Return the user results map for emitting
-    return Object.fromEntries(userResults);
+    // Return both user results and affected users
+    return {
+      userResults: Object.fromEntries(userResults),
+      affectedUsers: Object.fromEntries(affectedUsers),
+    };
   } catch (error) {
     console.error('Error processing bets:', error);
-    return {};
+    return { userResults: {}, affectedUsers: {} };
   }
 }
 
@@ -147,32 +163,42 @@ function calculatePayout(amount: number, isLuckySeven: boolean): number {
 async function updateUserForWin(userId: string, payout: number) {
   try {
     const user = await User.findById(userId);
-    if (!user) return;
+    if (!user) return null;
 
-    // Increase tokens by payout
-    // Update win streak (increment current, update highest if needed)
     const newWinStreak = user.currentWinStreak + 1;
     const highestWinStreak = Math.max(user.highestWinStreak, newWinStreak);
 
-    await User.findByIdAndUpdate(userId, {
-      $inc: { tokens: payout },
-      currentWinStreak: newWinStreak,
-      highestWinStreak,
-    });
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $inc: { tokens: payout },
+        currentWinStreak: newWinStreak,
+        highestWinStreak,
+      },
+      { new: true } // Return the updated document
+    );
 
     console.log(`User ${userId} won ${payout} tokens, streak: ${newWinStreak}`);
+    return updatedUser;
   } catch (error) {
     console.error('Error updating user for win:', error);
+    return null;
   }
 }
 
 // Update user for losing bet
 async function updateUserForLoss(userId: string) {
   try {
-    await User.findByIdAndUpdate(userId, { currentWinStreak: 0 });
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { currentWinStreak: 0 },
+      { new: true }
+    );
     console.log(`User ${userId} lost, streak reset`);
+    return updatedUser;
   } catch (error) {
     console.error('Error updating user for loss:', error);
+    return null;
   }
 }
 
