@@ -28,7 +28,6 @@ export const login =
   async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     try {
       const { data } = await api.login(formData);
-      console.log('Login data:', data);
       dispatch({ type: LOGIN, data });
       history('/');
       messages.success('Login Successful');

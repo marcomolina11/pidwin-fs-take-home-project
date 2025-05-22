@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CircularProgress, Container } from '@mui/material';
 import { Route, BrowserRouter, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -9,9 +9,28 @@ import Login from './components/Login/Login';
 import Home from './components/Home/Home';
 import PasswordSetting from './components/PasswordSettings/PasswordSettings';
 import WinStreaks from './components/WinStreaks/WinStreaks';
+import socketService from './services/socketService';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectIsAuthenticated } from './selectors/authSelectors';
 
 const App: React.FC = () => {
   const { loading } = useDataRefresh();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dispatch = useDispatch();
+
+  // Initialize socket when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      socketService.initialize(dispatch);
+    } else {
+      socketService.disconnect();
+    }
+
+    // Clean up socket on app unmount
+    return () => {
+      socketService.disconnect();
+    };
+  }, [isAuthenticated, dispatch]);
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 import Game from '../models/game.js';
 import Bet from '../models/bet.js';
 import User from '../models/user.js';
+import { io } from '../../index.js';
 import {
   GAME_TIME_INTERVAL,
   LUCKY_SEVEN_MULTIPLYER,
@@ -21,10 +22,6 @@ export const startGameCycle = async () => {
         console.log('Simulating dice roll...');
         const dice1 = Math.floor(Math.random() * 6) + 1;
         const dice2 = Math.floor(Math.random() * 6) + 1;
-        const rollResult = dice1 + dice2;
-        const isLuckySeven = rollResult === 7;
-
-        console.log('Dice roll results:', dice1, dice2, `(${rollResult})`);
 
         // Complete current game
         const updatedGame = await Game.findByIdAndUpdate(
@@ -44,8 +41,28 @@ export const startGameCycle = async () => {
 
         console.log('Game completed:', updatedGame._id);
 
+        // Use virtual properties from the game model
+        const rollResult = updatedGame.rollResult as number;
+        const isLuckySeven = updatedGame.isLuckySeven as boolean;
+
+        console.log('Dice roll results:', dice1, dice2, `(${rollResult})`);
+
         // Process all bets for this game
-        await processBetsForGame(updatedGame._id, isLuckySeven);
+        const userResults = await processBetsForGame(
+          updatedGame._id.toString(),
+          isLuckySeven
+        );
+
+        // Emit game result to all connected clients
+        io.emit('gameResult', {
+          id: updatedGame._id.toString(),
+          dice1: updatedGame.dice1,
+          dice2: updatedGame.dice2,
+          rollResult, // Use the virtual property
+          isLuckySeven, // Use the virtual property
+          timestamp: updatedGame.createdAt,
+          userResults,
+        });
 
         // Create new game
         const newGame = await Game.create({});
@@ -68,9 +85,12 @@ export const startGameCycle = async () => {
 // Process all bets for a completed game
 async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
   try {
-    // Find all bets for this game
+    // Find all bets for this game WITHOUT populating user
     const bets = await Bet.find({ game: gameId });
     console.log(`Processing ${bets.length} bets for game ${gameId}`);
+
+    // Store bet results for each user
+    const userResults = new Map();
 
     for (const bet of bets) {
       // Determine win/lose
@@ -83,15 +103,28 @@ async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
       // Update bet with result
       await Bet.findByIdAndUpdate(bet._id, { result });
 
+      // Get user._id from bet
+      const userId = bet.user.toString();
+
       // Update user tokens and streaks
       if (isWin) {
-        await updateUserForWin(bet.user.toString(), payout);
+        await updateUserForWin(userId, payout);
       } else {
-        await updateUserForLoss(bet.user.toString());
+        await updateUserForLoss(userId);
       }
+
+      // Store this user's result
+      userResults.set(userId, {
+        userId: userId,
+        result: result,
+      });
     }
+
+    // Return the user results map for emitting
+    return Object.fromEntries(userResults);
   } catch (error) {
     console.error('Error processing bets:', error);
+    return {};
   }
 }
 

@@ -10,10 +10,11 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '../../selectors/authSelectors';
-import { UserData } from '../../types/actionTypes';
+import { UserData } from '../../types';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { placeBet } from '../../actions/game';
+import { styles } from './styles';
 
 const GameForm: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
@@ -35,23 +36,26 @@ const GameForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (user) {
-      //validate inputs
+      // Validate inputs
       let amount = wager;
       if (typeof amount === 'string') {
         amount = parseInt(amount);
       }
-      //dispatch placeBet action
+      // Dispatch placeBet action
       dispatch(
         placeBet({
           amount,
           isLuckySeven,
         })
       );
+      // Clear form data
+      setWager(0);
+      setIsLuckySeven(false);
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+    <Paper elevation={3} sx={styles.paper}>
       <Box
         component="form"
         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}

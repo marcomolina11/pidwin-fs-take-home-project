@@ -3,6 +3,7 @@ import Game from '../models/game.js';
 import User from '../models/user.js';
 import Bet from '../models/bet.js';
 import { AuthRequest, PlaceBetRequest } from '../types/index.js';
+import { createBetResponse } from '../utils/responseHelper.js';
 
 const placeBet = async (req: AuthRequest, res: Response) => {
   const { amount, isLuckySeven }: PlaceBetRequest = req.body;
@@ -11,27 +12,43 @@ const placeBet = async (req: AuthRequest, res: Response) => {
     // Get current user
     const user = await User.findById(req.userId);
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return createBetResponse(res, 400, 'User not found', 'rejected');
     }
 
     // Validate tokens
     if (user.tokens < amount) {
-      return res.status(400).json({ message: 'Insufficient tokens' });
+      return createBetResponse(res, 400, 'Insufficient tokens', 'rejected');
     }
 
     // Get current game
     const currentGame = await Game.getCurrentGame();
     if (!currentGame) {
-      return res.status(400).json({ message: 'No active game found' });
+      return createBetResponse(res, 400, 'No active game found', 'rejected');
     }
-
-    console.log('currentGame: ', currentGame);
 
     // Check if we can still accept bets
     if (!currentGame.canAcceptBets) {
-      return res
-        .status(400)
-        .json({ message: 'Sorry, the betting window closed' });
+      return createBetResponse(
+        res,
+        200,
+        'Sorry, the betting window closed',
+        'rejected'
+      );
+    }
+
+    // Check if user already placed a bet on this game
+    const existingBet = await Bet.findOne({
+      user: user._id,
+      game: currentGame._id,
+    });
+
+    if (existingBet) {
+      return createBetResponse(
+        res,
+        200,
+        'You already placed a bet on this roll',
+        'rejected'
+      );
     }
 
     // Create bet and update user tokens
@@ -50,11 +67,16 @@ const placeBet = async (req: AuthRequest, res: Response) => {
       { new: true }
     );
 
-    res.status(200).json({ message: 'Bet Placed Successfully', updatedUser });
-    //res.status(200).json({ message: "Bet placed successfully", bet });
+    return createBetResponse(
+      res,
+      200,
+      'Bet Placed Successfully',
+      'accepted',
+      updatedUser
+    );
   } catch (error) {
     console.error('Place bet error:', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    return createBetResponse(res, 500, 'Something went wrong', 'rejected');
   }
 };
 

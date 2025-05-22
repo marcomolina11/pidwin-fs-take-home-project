@@ -11,6 +11,7 @@ interface StylesInterface {
   brandContainer: React.CSSProperties;
   purple: SxProps<Theme>;
   paper: SxProps<Theme>;
+  game: SxProps<Theme>;
 }
 
 export const styles: StylesInterface = {
@@ -53,5 +54,13 @@ export const styles: StylesInterface = {
     margin: '30px 0',
     textAlign: 'center',
     padding: '10px 20px',
+  },
+  game: {
+    display: 'flex',
+    gap: '16px',
+    paddingLeft: 0,
+    paddingRight: 0,
+    maxWidth: '100%',
+    margin: 0,
   },
 };

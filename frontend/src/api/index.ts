@@ -30,3 +30,4 @@ export const getCurrentUser = () => API.get('/api/user/currentUser');
 export const placeBet = (formData: PlaceBetFormData) =>
   API.post('/api/game/placeBet', formData);
 export const getWinStreaks = () => API.get('/api/game/winStreaks');
+export const getRecentRolls = () => API.get('/api/game/recentRolls');

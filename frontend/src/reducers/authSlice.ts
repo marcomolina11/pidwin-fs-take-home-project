@@ -1,4 +1,5 @@
-import { UserData, AuthState, AuthAction } from '../types/actionTypes';
+import { AuthState, AuthAction } from '../types/actionTypes';
+import { UserData } from '../types';
 import { LOGIN, LOGOUT, UPDATE_USER } from '../constants/actionTypes';
 import { jwtDecode } from 'jwt-decode';
 

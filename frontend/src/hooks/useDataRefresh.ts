@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { fetchCurrentUser } from '../actions/login';
+import { fetchRecentRolls } from '../actions/game';
 import { selectToken } from '../selectors/authSelectors';
 
 export const useDataRefresh = () => {
@@ -14,6 +15,7 @@ export const useDataRefresh = () => {
     const refreshData = async () => {
       if (token) {
         await dispatch(fetchCurrentUser());
+        await dispatch(fetchRecentRolls());
       }
       setLoading(false);
     };

@@ -12,7 +12,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as actionType from '../../constants/actionTypes';
 import { styles } from './styles';
-import { UserData } from '../../types/actionTypes';
+import { UserData } from '../../types';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { useSelector } from 'react-redux';

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Container, Paper, Typography } from '@mui/material';
 import { styles } from './styles';
-import { UserData } from '../../types/actionTypes';
+import { UserData } from '../../types';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../selectors/authSelectors';
 import GameForm from '../GameForm/GameForm';
+import RecentRolls from '../RecentRolls/RecentRolls';
 
 const Home: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
@@ -23,7 +24,11 @@ const Home: React.FC = () => {
             </Typography>
           )}
         </Paper>
+      </Container>
+      <Container sx={styles.game} maxWidth={false} disableGutters>
+        {user !== null && <RecentRolls />}
         {user !== null && <GameForm />}
+        {user !== null && <RecentRolls />}
       </Container>
     </div>
   );

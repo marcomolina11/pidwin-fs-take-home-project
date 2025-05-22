@@ -3,8 +3,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import mongoose, { Document } from 'mongoose';
 
 // Document Types
-export interface UserDocument {
-  _id: string;
+export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
@@ -30,6 +29,10 @@ export interface BetDocument extends Document {
   amount: number;
   isLuckySeven: boolean;
   result: 'pending' | 'win' | 'lose';
+}
+
+export interface PopulatedBetDocument extends Omit<BetDocument, 'user'> {
+  user: UserDocument;
 }
 
 // Request Object Types
@@ -69,4 +72,21 @@ export interface UserJwtPayload extends JwtPayload {
   name: string;
   email: string;
   password: string;
+}
+
+// Response Types
+export interface PlaceBetResponse {
+  message: string;
+  status: 'accepted' | 'rejected';
+  updatedUser?: UserDocument | null;
+}
+
+// Game Result Types
+export interface UserResultValue {
+  userId: string;
+  result: 'pending' | 'win' | 'lose';
+}
+
+export interface UserResults {
+  [userId: string]: UserResultValue;
 }

@@ -1,5 +1,5 @@
 export const SIGNUP_BONUS = 100;
-export const GAME_TIME_INTERVAL = 60000;
-export const BETTING_WINDOW_SECONDS = 50;
+export const GAME_TIME_INTERVAL = 15000;
+export const BETTING_WINDOW_SECONDS = 10;
 export const LUCKY_SEVEN_MULTIPLYER = 7;
 export const NON_LUCKY_SEVEN_MULTIPLYER = 1;
