@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Paper, Typography } from '@mui/material';
+import { styles } from './styles';
 import { UserData } from '../../types/actionTypes';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../selectors/authSelectors';
@@ -11,7 +12,7 @@ const Home: React.FC = () => {
   return (
     <div>
       <Container component="main" maxWidth="sm">
-        <Paper elevation={3}>
+        <Paper elevation={3} sx={styles.paper}>
           {user !== null ? (
             <Typography variant="h4" align="center" color="primary">
               {`Welcome ${user.name}`}
@@ -22,7 +23,7 @@ const Home: React.FC = () => {
             </Typography>
           )}
         </Paper>
-        <GameForm />
+        {user !== null && <GameForm />}
       </Container>
     </div>
   );

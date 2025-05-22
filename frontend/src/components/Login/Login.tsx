@@ -28,11 +28,11 @@ const formDataInitVal: SignupFormData = {
 };
 
 const Login: React.FC = () => {
+  const user: UserData | null = useSelector(selectUser);
   const [formData, setFormData] = useState<SignupFormData>(formDataInitVal);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isExistingUser, setIsExsistingUser] = useState<boolean>(true);
 
-  const user: UserData | null = useSelector(selectUser);
   const history = useNavigate();
   const dispatch = useDispatch<ThunkDispatch<any, any, AnyAction>>();
 

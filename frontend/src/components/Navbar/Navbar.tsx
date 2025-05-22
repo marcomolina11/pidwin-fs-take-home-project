@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect } from 'react';
-import { AppBar, Typography, Toolbar, Avatar, Button } from '@mui/material';
+import {
+  AppBar,
+  Typography,
+  Toolbar,
+  Avatar,
+  Button,
+  Box,
+} from '@mui/material';
+import CasinoIcon from '@mui/icons-material/Casino';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as actionType from '../../constants/actionTypes';
@@ -30,6 +38,7 @@ const Navbar: React.FC = () => {
   return (
     <AppBar sx={styles.appBar} position="static" color="inherit">
       <div style={styles.brandContainer}>
+        <CasinoIcon sx={styles.logo} />
         <Typography
           component={Link}
           to="/"
@@ -37,10 +46,23 @@ const Navbar: React.FC = () => {
           variant="h5"
           align="center"
         >
-          CoinToss
+          Lucky-7
         </Typography>
       </div>
       <Toolbar sx={styles.toolbar}>
+        <Box sx={{ display: 'flex', gap: 1, mr: 1 }}>
+          <Button component={Link} to="/" variant="outlined" color="primary">
+            Home
+          </Button>
+          <Button
+            component={Link}
+            to="/winStreaks"
+            variant="outlined"
+            color="primary"
+          >
+            Win Streaks
+          </Button>
+        </Box>
         {user !== null ? (
           <div style={styles.profile}>
             <Typography sx={styles.userName} variant="h6">

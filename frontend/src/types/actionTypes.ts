@@ -2,6 +2,7 @@
 export enum ActionType {
   LOGIN = 'LOGIN',
   LOGOUT = 'LOGOUT',
+  UPDATE_USER = 'UPDATE_USER',
 }
 
 // Auth data type
@@ -19,7 +20,12 @@ export interface LogoutAction {
   type: ActionType.LOGOUT;
 }
 
-export type AuthAction = LoginAction | LogoutAction;
+export interface UpdateUserAction {
+  type: ActionType.UPDATE_USER;
+  payload: UserData;
+}
+
+export type AuthAction = LoginAction | LogoutAction | UpdateUserAction;
 
 // State interfaces
 export interface AuthState {
@@ -46,6 +52,11 @@ export interface PasswordChangeFormData {
   newPassword: string;
 }
 
+export interface PlaceBetFormData {
+  amount: number;
+  isLuckySeven: boolean;
+}
+
 // User interface
 export interface UserData {
   _id: string;
@@ -55,4 +66,6 @@ export interface UserData {
   exp?: number;
   picture?: string;
   tokens: number;
+  currentWinStreak: number;
+  highestWinStreak: number;
 }

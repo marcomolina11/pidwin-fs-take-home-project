@@ -1,5 +1,5 @@
 import { UserData, AuthState, AuthAction } from '../types/actionTypes';
-import { LOGIN, LOGOUT } from '../constants/actionTypes';
+import { LOGIN, LOGOUT, UPDATE_USER } from '../constants/actionTypes';
 import { jwtDecode } from 'jwt-decode';
 
 const initialState: AuthState = {
@@ -45,6 +45,11 @@ const authReducer = (
         user: null,
         token: null,
         isAuthenticated: false,
+      };
+    case UPDATE_USER:
+      return {
+        ...state,
+        user: action.payload,
       };
     default:
       return state;

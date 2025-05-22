@@ -10,6 +10,7 @@ interface StylesInterface {
   userName: SxProps<Theme>;
   brandContainer: React.CSSProperties;
   purple: SxProps<Theme>;
+  paper: SxProps<Theme>;
 }
 
 export const styles: StylesInterface = {
@@ -47,5 +48,10 @@ export const styles: StylesInterface = {
   purple: {
     color: theme.palette.getContrastText(deepPurple[500]),
     backgroundColor: deepPurple[500],
+  },
+  paper: {
+    margin: '30px 0',
+    textAlign: 'center',
+    padding: '10px 20px',
   },
 };

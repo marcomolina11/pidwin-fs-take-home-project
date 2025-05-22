@@ -8,14 +8,19 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '../../selectors/authSelectors';
 import { UserData } from '../../types/actionTypes';
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
+import { placeBet } from '../../actions/game';
 
 const GameForm: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
   const [wager, setWager] = useState<number | string>(0);
-  const [isLucky, setIsLucky] = useState(false);
+  const [isLuckySeven, setIsLuckySeven] = useState(false);
+
+  const dispatch = useDispatch<ThunkDispatch<any, any, AnyAction>>();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -24,14 +29,25 @@ const GameForm: React.FC = () => {
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsLucky(e.target.checked);
+    setIsLuckySeven(e.target.checked);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    //validate inputs
-
-    //make api call with wager amount, isLucky, and the user
+    if (user) {
+      //validate inputs
+      let amount = wager;
+      if (typeof amount === 'string') {
+        amount = parseInt(amount);
+      }
+      //dispatch placeBet action
+      dispatch(
+        placeBet({
+          amount,
+          isLuckySeven,
+        })
+      );
+    }
   };
 
   return (
@@ -46,6 +62,7 @@ const GameForm: React.FC = () => {
         </Typography>
 
         <TextField
+          name="wager"
           label="Wager Amount"
           type="number"
           required
@@ -61,8 +78,9 @@ const GameForm: React.FC = () => {
         <FormControlLabel
           control={
             <Checkbox
+              name="isLuckySeven"
               color="primary"
-              checked={isLucky}
+              checked={isLuckySeven}
               onChange={(e) => handleCheckboxChange(e)}
             />
           }

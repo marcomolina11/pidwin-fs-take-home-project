@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import { SignupRequest } from '../types/index.js';
+import { SIGNUP_BONUS } from '../constants/constants.js';
 
 const signup = async (req: Request, res: Response) => {
   const {
@@ -12,8 +13,6 @@ const signup = async (req: Request, res: Response) => {
     firstName,
     lastName,
   }: SignupRequest = req.body;
-
-  const SIGNUP_BONUS = 100;
 
   try {
     const existingUser = await User.findOne({ email });

@@ -26,7 +26,7 @@ const betSchema = new Schema<BetDocument>(
     },
     result: {
       type: String,
-      enum: ['win', 'lose'],
+      enum: ['pending', 'win', 'lose'],
       required: true,
     },
   },
