@@ -7,10 +7,7 @@ import userRouter from './src/api/user.js';
 import gameRouter from './src/api/game.js';
 import http from 'http';
 import { Server } from 'socket.io';
-import {
-  startGameCycle,
-  stopGameCycle,
-} from './src/controllers/gameController.js';
+import { startGameCycle, stopGameCycle } from './src/services/gameService.js';
 
 dotenv.config();
 
