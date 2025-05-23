@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { selectCurrentGame } from '../../selectors/gameSelectors';
-import { GAME_TIME_INTERVAL } from '../../constants/actionTypes';
+import { GAME_TIME_INTERVAL } from '../../constants';
 import { styles } from './styles';
 
 const NextRollCountdown: React.FC = () => {

@@ -1,0 +1,1 @@
+export const GAME_TIME_INTERVAL = 15000;
