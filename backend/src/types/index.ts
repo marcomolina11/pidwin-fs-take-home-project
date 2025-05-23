@@ -71,7 +71,6 @@ export interface UserJwtPayload extends JwtPayload {
   _id: string;
   name: string;
   email: string;
-  password: string;
 }
 
 // Response Types
