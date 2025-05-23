@@ -51,7 +51,7 @@ const placeBet = async (req: AuthRequest, res: Response) => {
       );
     }
 
-    // Create bet and update user tokens
+    // Create bet - let any errors propagate to the outer catch block
     const bet = await Bet.create({
       user: user._id,
       game: currentGame._id,
@@ -64,8 +64,19 @@ const placeBet = async (req: AuthRequest, res: Response) => {
     const updatedUser = await User.findByIdAndUpdate(
       user._id,
       { $inc: { tokens: -amount } },
-      { new: true }
+      { new: true, projection: { password: 0 } }
     );
+
+    if (!updatedUser) {
+      // If user update fails revert bet creation
+      await Bet.findByIdAndDelete(bet._id);
+      return createBetResponse(
+        res,
+        500,
+        'Failed to update user tokens',
+        'rejected'
+      );
+    }
 
     return createBetResponse(
       res,
@@ -74,9 +85,11 @@ const placeBet = async (req: AuthRequest, res: Response) => {
       'accepted',
       updatedUser
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Place bet error:', error);
-    return createBetResponse(res, 500, 'Something went wrong', 'rejected');
+
+    const errorMessage = error.message || 'Something went wrong';
+    return createBetResponse(res, 500, errorMessage, 'rejected');
   }
 };
 

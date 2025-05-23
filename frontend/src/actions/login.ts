@@ -40,8 +40,8 @@ export const changePassword =
   (formData: PasswordChangeFormData, history: NavigateFunction) =>
   async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     try {
-      const { data } = await api.changePassword(formData);
-      dispatch({ type: LOGOUT, data });
+      await api.changePassword(formData);
+      dispatch({ type: LOGOUT });
       history('/');
       messages.success('Password Change Was Successful');
     } catch (error: any) {

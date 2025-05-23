@@ -6,7 +6,6 @@ export interface UserData {
   _id: string;
   name: string;
   email: string;
-  password: string;
   exp?: number;
   picture?: string;
   tokens: number;

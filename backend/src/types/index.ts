@@ -72,7 +72,7 @@ export interface UserJwtPayload extends JwtPayload {
 export interface PlaceBetResponse {
   message: string;
   status: 'accepted' | 'rejected';
-  updatedUser?: UserDocument | null;
+  updatedUser?: Omit<UserDocument, 'password'> | null;
 }
 
 // Game Result Types

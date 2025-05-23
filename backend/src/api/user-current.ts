@@ -8,7 +8,7 @@ const getCurrentUser = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Unauthenticated' });
     }
 
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.userId).select('-password');
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
     }

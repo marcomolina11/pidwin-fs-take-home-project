@@ -6,7 +6,7 @@ export const createBetResponse = (
   status: number,
   message: string,
   responseStatus: 'accepted' | 'rejected',
-  updatedUser?: UserDocument | null
+  updatedUser?: Omit<UserDocument, 'password'> | null
 ): Response => {
   const response: PlaceBetResponse = {
     message,

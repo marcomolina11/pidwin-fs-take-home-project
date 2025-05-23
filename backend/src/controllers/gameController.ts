@@ -32,7 +32,7 @@ export const startGameCycle = async () => {
             dice2,
             isComplete: true,
           },
-          { new: true } // Return updated document
+          { new: true }
         );
 
         if (!updatedGame) {
@@ -140,7 +140,6 @@ async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
       }
     }
 
-    // Return both user results and affected users
     return {
       userResults: Object.fromEntries(userResults),
       affectedUsers: Object.fromEntries(affectedUsers),
@@ -197,7 +196,7 @@ async function updateUserForWin(userId: string, payout: number) {
         currentWinStreak: newWinStreak,
         highestWinStreak,
       },
-      { new: true } // Return the updated document
+      { new: true, projection: { password: 0 } }
     );
 
     console.log(`User ${userId} won ${payout} tokens, streak: ${newWinStreak}`);
@@ -214,7 +213,7 @@ async function updateUserForLoss(userId: string) {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { currentWinStreak: 0 },
-      { new: true }
+      { new: true, projection: { password: 0 } }
     );
     console.log(`User ${userId} lost, streak reset`);
     return updatedUser;
