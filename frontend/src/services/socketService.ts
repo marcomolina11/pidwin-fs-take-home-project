@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import { addGameResult } from '../actions/game';
+import { addGameResult, setCurrentGame } from '../actions/game';
 import { UPDATE_USER } from '../constants/actionTypes';
 import { AnyAction } from 'redux';
 import { RootState } from '../types/store';
@@ -43,6 +43,7 @@ class SocketService {
   private setupListeners(): void {
     if (!this.socket) return;
 
+    // Listen for game results
     this.socket.on('gameResult', (gameResult) => {
       if (this.dispatch && this.getState) {
         // Dispatch game result
@@ -64,6 +65,13 @@ class SocketService {
             payload: gameResult.affectedUsers[currentUser._id],
           });
         }
+      }
+    });
+
+    // Listen for new game events
+    this.socket.on('newGame', (newGame) => {
+      if (this.dispatch) {
+        this.dispatch(setCurrentGame(newGame));
       }
     });
   }

@@ -74,6 +74,12 @@ export const startGameCycle = async () => {
 
         currentGame = newGame;
         console.log('New game created:', currentGame._id);
+
+        // Emit new game event with creation time
+        io.emit('newGame', {
+          id: newGame._id.toString(),
+          createdAt: newGame.createdAt,
+        });
       } catch (error) {
         console.error('Error in game cycle:', error);
       }

@@ -8,6 +8,7 @@ import {
   ADD_GAME_RESULT,
   CLEAR_GAME_RESULTS,
   SET_GAME_RESULTS,
+  SET_CURRENT_GAME,
 } from '../constants/actionTypes';
 import { PlaceBetResponse } from '../types';
 
@@ -63,3 +64,24 @@ export const fetchRecentRolls =
       console.error('Error fetching recent rolls:', error);
     }
   };
+
+// Add these actions
+export const setCurrentGame = (game: any) => ({
+  type: SET_CURRENT_GAME,
+  payload: game,
+});
+
+export const fetchCurrentGame = () => async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+  try {
+    const { data } = await api.getCurrentGame();
+    
+    if (data) {
+      dispatch({
+        type: SET_CURRENT_GAME,
+        payload: data,
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching current game:', error);
+  }
+};

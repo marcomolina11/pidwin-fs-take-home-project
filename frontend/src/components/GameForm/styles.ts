@@ -9,5 +9,6 @@ export const styles: StylesInterface = {
     textAlign: 'center',
     padding: '16px',
     minWidth: '522px',
+    maxWidth: '100%',
   },
 };

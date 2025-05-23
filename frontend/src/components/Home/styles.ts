@@ -62,5 +62,6 @@ export const styles: StylesInterface = {
     paddingRight: 0,
     maxWidth: '100%',
     margin: 0,
+    justifyContent: 'space-between',
   },
 };

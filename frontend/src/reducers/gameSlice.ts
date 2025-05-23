@@ -3,10 +3,12 @@ import {
   ADD_GAME_RESULT,
   CLEAR_GAME_RESULTS,
   SET_GAME_RESULTS,
+  SET_CURRENT_GAME,
 } from '../constants/actionTypes';
 
 const initialState: GameState = {
   recentRolls: [],
+  currentGame: null,
 };
 
 const gameReducer = (
@@ -32,8 +34,6 @@ const gameReducer = (
       };
 
     case SET_GAME_RESULTS:
-      // Set all results at once (used for initial load from API)
-      // The API already sends them in the correct order
       return {
         ...state,
         recentRolls: action.payload,
@@ -43,6 +43,12 @@ const gameReducer = (
       return {
         ...state,
         recentRolls: [],
+      };
+
+    case SET_CURRENT_GAME:
+      return {
+        ...state,
+        currentGame: action.payload,
       };
 
     default:

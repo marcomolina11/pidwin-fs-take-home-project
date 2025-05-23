@@ -24,6 +24,7 @@ export enum ActionType {
   ADD_GAME_RESULT = 'ADD_GAME_RESULT',
   CLEAR_GAME_RESULTS = 'CLEAR_GAME_RESULTS',
   SET_GAME_RESULTS = 'SET_GAME_RESULTS',
+  SET_CURRENT_GAME = 'SET_CURRENT_GAME',
 }
 
 // Auth data type
@@ -60,8 +61,21 @@ export interface SetGameResultsAction {
   payload: GameResult[];
 }
 
+export interface SetCurrentGameAction {
+  type: ActionType.SET_CURRENT_GAME;
+  payload: {
+    id: string;
+    createdAt: string;
+    canAcceptBets: boolean;
+  };
+}
+
 export type AuthAction = LoginAction | LogoutAction | UpdateUserAction;
-export type GameAction = AddGameResultAction | ClearGameResultsAction | SetGameResultsAction;
+export type GameAction = 
+  | AddGameResultAction 
+  | ClearGameResultsAction 
+  | SetGameResultsAction 
+  | SetCurrentGameAction;
 
 // State interfaces
 export interface AuthState {
@@ -72,6 +86,11 @@ export interface AuthState {
 
 export interface GameState {
   recentRolls: GameResult[];
+  currentGame: {
+    id: string;
+    createdAt: string;
+    canAcceptBets: boolean;
+  } | null;
 }
 
 // Form data interfaces

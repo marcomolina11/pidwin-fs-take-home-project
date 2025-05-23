@@ -55,7 +55,7 @@ const GameForm: React.FC = () => {
   };
 
   return (
-    <Paper elevation={3} sx={styles.paper}>
+    <Paper sx={styles.paper}>
       <Box
         component="form"
         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}

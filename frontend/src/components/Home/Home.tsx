@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../../selectors/authSelectors';
 import GameForm from '../GameForm/GameForm';
 import RecentRolls from '../RecentRolls/RecentRolls';
+import NextRollCountdown from '../NextRollCountdown/NextRollCountdown';
 
 const Home: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
@@ -28,7 +29,7 @@ const Home: React.FC = () => {
       <Container sx={styles.game} maxWidth={false} disableGutters>
         {user !== null && <RecentRolls />}
         {user !== null && <GameForm />}
-        {user !== null && <RecentRolls />}
+        {user !== null && <NextRollCountdown />}
       </Container>
     </div>
   );
