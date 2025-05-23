@@ -28,10 +28,10 @@ export const placeBet =
           type: UPDATE_USER,
           payload: data.updatedUser,
         });
-        
+
         // Set active bet flag to true when bet is accepted
         dispatch(setHasActiveBet(true));
-        
+
         messages.success('Bet Placed Successfully');
       }
     } catch (error: any) {
@@ -53,12 +53,12 @@ export const fetchRecentRolls =
     try {
       const { data } = await api.getRecentRolls();
 
-      // Clear existing rolls first
+      // Clear existing results first
       dispatch({
         type: CLEAR_GAME_RESULTS,
       });
 
-      // Add all results at once in the correct order from the API
+      // Set new recent results
       if (data && Array.isArray(data)) {
         dispatch({
           type: SET_GAME_RESULTS,

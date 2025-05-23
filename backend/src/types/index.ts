@@ -31,12 +31,7 @@ export interface BetDocument extends Document {
   result: 'pending' | 'win' | 'lose';
 }
 
-export interface PopulatedBetDocument extends Omit<BetDocument, 'user'> {
-  user: UserDocument;
-}
-
 // Request Object Types
-
 export interface AuthRequest extends Request {
   userId?: string;
 }

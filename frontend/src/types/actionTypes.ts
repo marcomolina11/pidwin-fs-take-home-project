@@ -1,6 +1,6 @@
 import { UserData } from '.';
 
-// Add GameResult interface
+// GameResult interface
 export interface GameResult {
   id: string;
   dice1: number;

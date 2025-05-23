@@ -1,16 +1,6 @@
 import { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 
-// Document Types
-export interface UserDocument {
-  _id: string;
-  name: string;
-  email: string;
-  password: string;
-  id?: string;
-  token: number;
-}
-
 // User interface
 export interface UserData {
   _id: string;

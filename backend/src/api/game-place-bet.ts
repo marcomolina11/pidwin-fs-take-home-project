@@ -26,7 +26,7 @@ const placeBet = async (req: AuthRequest, res: Response) => {
       return createBetResponse(res, 400, 'No active game found', 'rejected');
     }
 
-    // Check if we can still accept bets
+    // Check if current game still accept bets
     if (!currentGame.canAcceptBets) {
       return createBetResponse(
         res,
