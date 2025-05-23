@@ -7,6 +7,7 @@ import {
   LUCKY_SEVEN_MULTIPLYER,
   NON_LUCKY_SEVEN_MULTIPLYER,
 } from '../constants/constants.js';
+import crypto from 'crypto';
 
 let gameInterval: NodeJS.Timeout | null = null;
 
@@ -20,8 +21,8 @@ export const startGameCycle = async () => {
     gameInterval = setInterval(async () => {
       try {
         console.log('Simulating dice roll...');
-        const dice1 = Math.floor(Math.random() * 6) + 1;
-        const dice2 = Math.floor(Math.random() * 6) + 1;
+        const dice1 = unbiasedDieRoll();
+        const dice2 = unbiasedDieRoll();
 
         // Complete current game
         const updatedGame = await Game.findByIdAndUpdate(
@@ -148,6 +149,21 @@ async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
     console.error('Error processing bets:', error);
     return { userResults: {}, affectedUsers: {} };
   }
+}
+
+// Eliminates modulo bias
+function unbiasedDieRoll(): number {
+  // Maximum multiple of 6 that fits in a byte (252 = 6 * 42)
+  const MAX_MULTIPLE = 252;
+  let value;
+
+  // Reject values outside our "fair" range
+  do {
+    value = crypto.randomBytes(1)[0];
+  } while (value >= MAX_MULTIPLE);
+
+  // Map to 1-6 without bias
+  return (value % 6) + 1;
 }
 
 // Calculate payout based on bet amount and type

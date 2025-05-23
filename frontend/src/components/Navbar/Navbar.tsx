@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {
   AppBar,
   Typography,
@@ -20,9 +20,40 @@ import { selectUser } from '../../selectors/authSelectors';
 
 const Navbar: React.FC = () => {
   const user: UserData | null = useSelector(selectUser);
-
   const dispatch = useDispatch<ThunkDispatch<any, any, AnyAction>>();
   const history = useNavigate();
+
+  // Track previous token value
+  const prevTokensRef = useRef<number | null>(null);
+  // Animation state
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Check for token changes
+  useEffect(() => {
+    if (user) {
+      // Check if we have a previous value and if tokens have changed
+      if (
+        prevTokensRef.current !== null &&
+        user.tokens !== undefined &&
+        user.tokens !== prevTokensRef.current
+      ) {
+        // Tokens changed, trigger animation
+        setIsAnimating(true);
+
+        // Reset animation after duration
+        const timer = setTimeout(() => {
+          setIsAnimating(false);
+        }, 700);
+
+        return () => clearTimeout(timer);
+      }
+
+      // Update reference with current token value
+      if (user.tokens !== undefined) {
+        prevTokensRef.current = user.tokens;
+      }
+    }
+  }, [user]);
 
   const logout = useCallback(() => {
     dispatch({ type: actionType.LOGOUT });
@@ -37,14 +68,24 @@ const Navbar: React.FC = () => {
 
   // Function to get user initials or placeholder
   const getUserInitials = () => {
-    if (!user || !user.name) return '?'; // Safe fallback
+    if (!user || !user.name) return '?';
 
-    // Now we can safely access user.name
     const nameParts = user.name.split(' ');
     if (nameParts.length >= 2) {
       return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`.toUpperCase();
     }
     return user.name.charAt(0).toUpperCase();
+  };
+
+  // Token display with animation styles
+  const tokenDisplayStyle = {
+    ...styles.userName,
+    transition: 'all 0.5s ease',
+    ...(isAnimating && {
+      color: 'secondary.main',
+      transform: 'scale(1.1)',
+      fontWeight: 'bold',
+    }),
   };
 
   return (
@@ -77,7 +118,7 @@ const Navbar: React.FC = () => {
         </Box>
         {user !== null ? (
           <div style={styles.profile}>
-            <Typography sx={styles.userName} variant="h6">
+            <Typography sx={tokenDisplayStyle} variant="h6">
               {`Tokens: ${user.tokens}`}
             </Typography>
             <Avatar sx={styles.purple} alt={user.name} src={user.picture}>
