@@ -9,6 +9,7 @@ import {
   CLEAR_GAME_RESULTS,
   SET_GAME_RESULTS,
   SET_CURRENT_GAME,
+  SET_HAS_ACTIVE_BET,
 } from '../constants/actionTypes';
 import { PlaceBetResponse } from '../types';
 
@@ -27,6 +28,10 @@ export const placeBet =
           type: UPDATE_USER,
           payload: data.updatedUser,
         });
+        
+        // Set active bet flag to true when bet is accepted
+        dispatch(setHasActiveBet(true));
+        
         messages.success('Bet Placed Successfully');
       }
     } catch (error: any) {
@@ -65,23 +70,28 @@ export const fetchRecentRolls =
     }
   };
 
-// Add these actions
 export const setCurrentGame = (game: any) => ({
   type: SET_CURRENT_GAME,
   payload: game,
 });
 
-export const fetchCurrentGame = () => async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
-  try {
-    const { data } = await api.getCurrentGame();
-    
-    if (data) {
-      dispatch({
-        type: SET_CURRENT_GAME,
-        payload: data,
-      });
+export const fetchCurrentGame =
+  () => async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    try {
+      const { data } = await api.getCurrentGame();
+
+      if (data) {
+        dispatch({
+          type: SET_CURRENT_GAME,
+          payload: data,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching current game:', error);
     }
-  } catch (error) {
-    console.error('Error fetching current game:', error);
-  }
-};
+  };
+
+export const setHasActiveBet = (hasActiveBet: boolean) => ({
+  type: SET_HAS_ACTIVE_BET,
+  payload: hasActiveBet,
+});

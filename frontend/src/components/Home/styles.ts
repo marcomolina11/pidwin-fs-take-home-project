@@ -12,6 +12,7 @@ interface StylesInterface {
   purple: SxProps<Theme>;
   paper: SxProps<Theme>;
   game: SxProps<Theme>;
+  gameContainer: SxProps<Theme>;
 }
 
 export const styles: StylesInterface = {
@@ -57,11 +58,17 @@ export const styles: StylesInterface = {
   },
   game: {
     display: 'flex',
+    justifyContent: 'center',
     gap: '16px',
     paddingLeft: 0,
     paddingRight: 0,
     maxWidth: '100%',
     margin: 0,
-    justifyContent: 'space-between',
+  },
+  gameContainer: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    mt: 2,
   },
 };

@@ -4,7 +4,8 @@ export const styles: Record<string, SxProps<Theme>> = {
   container: {
     p: 2,
     textAlign: 'center',
-    maxWidth: '280px',
+    width: '280px',
+    flexShrink: 0,
   },
   progressBox: {
     position: 'relative',

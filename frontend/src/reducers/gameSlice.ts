@@ -4,11 +4,13 @@ import {
   CLEAR_GAME_RESULTS,
   SET_GAME_RESULTS,
   SET_CURRENT_GAME,
+  SET_HAS_ACTIVE_BET,
 } from '../constants/actionTypes';
 
 const initialState: GameState = {
   recentRolls: [],
   currentGame: null,
+  hasActiveBet: false,
 };
 
 const gameReducer = (
@@ -27,10 +29,11 @@ const gameReducer = (
         return state;
       }
 
-      // Add new result to beginning and keep only the last 5
+      // Add new result to beginning. Keep only the last 5
       return {
         ...state,
         recentRolls: [action.payload, ...state.recentRolls].slice(0, 5),
+        hasActiveBet: false,
       };
 
     case SET_GAME_RESULTS:
@@ -49,6 +52,13 @@ const gameReducer = (
       return {
         ...state,
         currentGame: action.payload,
+        hasActiveBet: false,
+      };
+
+    case SET_HAS_ACTIVE_BET:
+      return {
+        ...state,
+        hasActiveBet: action.payload,
       };
 
     default:

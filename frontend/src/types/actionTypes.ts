@@ -25,6 +25,7 @@ export enum ActionType {
   CLEAR_GAME_RESULTS = 'CLEAR_GAME_RESULTS',
   SET_GAME_RESULTS = 'SET_GAME_RESULTS',
   SET_CURRENT_GAME = 'SET_CURRENT_GAME',
+  SET_HAS_ACTIVE_BET = 'SET_HAS_ACTIVE_BET',
 }
 
 // Auth data type
@@ -70,12 +71,18 @@ export interface SetCurrentGameAction {
   };
 }
 
+export interface SetHasActiveBetAction {
+  type: ActionType.SET_HAS_ACTIVE_BET;
+  payload: boolean;
+}
+
 export type AuthAction = LoginAction | LogoutAction | UpdateUserAction;
-export type GameAction = 
-  | AddGameResultAction 
-  | ClearGameResultsAction 
-  | SetGameResultsAction 
-  | SetCurrentGameAction;
+export type GameAction =
+  | AddGameResultAction
+  | ClearGameResultsAction
+  | SetGameResultsAction
+  | SetCurrentGameAction
+  | SetHasActiveBetAction;
 
 // State interfaces
 export interface AuthState {
@@ -91,6 +98,7 @@ export interface GameState {
     createdAt: string;
     canAcceptBets: boolean;
   } | null;
+  hasActiveBet: boolean;
 }
 
 // Form data interfaces

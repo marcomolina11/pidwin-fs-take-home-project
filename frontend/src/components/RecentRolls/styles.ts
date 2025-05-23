@@ -7,8 +7,8 @@ interface StylesInterface {
 export const styles: StylesInterface = {
   container: {
     padding: 0,
-    width: '100%',
-    maxWidth: '280px',
+    width: '280px',
     margin: 0,
+    flexShrink: 0,
   },
 };

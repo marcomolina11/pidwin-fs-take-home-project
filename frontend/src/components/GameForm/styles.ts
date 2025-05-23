@@ -8,7 +8,7 @@ export const styles: StylesInterface = {
   paper: {
     textAlign: 'center',
     padding: '16px',
-    minWidth: '522px',
-    maxWidth: '100%',
+    width: '520px',
+    flexShrink: 0,
   },
 };
