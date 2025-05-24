@@ -14,5 +14,5 @@ export default {
     ],
   },
   testMatch: ['**/tests/**/*.test.ts', '**/src/**/*.test.ts'],
-  // setupFilesAfterEnv: ['./jest.setup.js'],
+  setupFilesAfterEnv: ['./tests/setup/jest.setup.js'],
 };

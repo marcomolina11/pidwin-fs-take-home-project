@@ -91,7 +91,10 @@ export const startGameCycle = async () => {
 };
 
 // Process all bets for a completed game
-async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
+export async function processBetsForGame(
+  gameId: string,
+  isLuckySeven: boolean
+) {
   try {
     // Find all bets for this game
     const bets = await Bet.find({ game: gameId });
@@ -151,7 +154,7 @@ async function processBetsForGame(gameId: string, isLuckySeven: boolean) {
 }
 
 // Eliminates modulo bias
-function unbiasedDieRoll(): number {
+export function unbiasedDieRoll(): number {
   // Maximum multiple of 6 that fits in a byte (252 = 6 * 42)
   const MAX_MULTIPLE = 252;
   let value;
@@ -166,7 +169,7 @@ function unbiasedDieRoll(): number {
 }
 
 // Calculate payout based on bet amount and type
-function calculatePayout(amount: number, isLuckySeven: boolean): number {
+export function calculatePayout(amount: number, isLuckySeven: boolean): number {
   // Base payout includes original wager amount
   const baseAmount = amount;
 
@@ -181,7 +184,7 @@ function calculatePayout(amount: number, isLuckySeven: boolean): number {
 }
 
 // Update user for winning bet
-async function updateUserForWin(userId: string, payout: number) {
+export async function updateUserForWin(userId: string, payout: number) {
   try {
     const user = await User.findById(userId);
     if (!user) return null;
@@ -208,7 +211,7 @@ async function updateUserForWin(userId: string, payout: number) {
 }
 
 // Update user for losing bet
-async function updateUserForLoss(userId: string) {
+export async function updateUserForLoss(userId: string) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
