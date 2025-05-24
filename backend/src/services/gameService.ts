@@ -186,23 +186,21 @@ export function calculatePayout(amount: number, isLuckySeven: boolean): number {
 // Update user for winning bet
 export async function updateUserForWin(userId: string, payout: number) {
   try {
-    const user = await User.findById(userId);
-    if (!user) return null;
-
-    const newWinStreak = user.currentWinStreak + 1;
-    const highestWinStreak = Math.max(user.highestWinStreak, newWinStreak);
-
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        $inc: { tokens: payout },
-        currentWinStreak: newWinStreak,
-        highestWinStreak,
+        $inc: { tokens: payout, currentWinStreak: 1 },
+        $max: { highestWinStreak: { $add: ['$currentWinStreak', 1] } },
       },
       { new: true, projection: { password: 0 } }
     );
 
-    console.log(`User ${userId} won ${payout} tokens, streak: ${newWinStreak}`);
+    if (updatedUser) {
+      console.log(
+        `User ${userId} won ${payout} tokens, streak: ${updatedUser.currentWinStreak}`
+      );
+    }
+
     return updatedUser;
   } catch (error) {
     console.error('Error updating user for win:', error);
