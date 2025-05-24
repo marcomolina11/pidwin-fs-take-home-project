@@ -1,8 +1,8 @@
 import express from 'express';
-import login from './user-login.js';
-import signup from './user-signup.js';
-import changePassword from './user-change-password.js';
-import getCurrentUser from './user-current.js';
+import login from '../api/user-login.js';
+import signup from '../api/user-signup.js';
+import changePassword from '../api/user-change-password.js';
+import getCurrentUser from '../api/user-current.js';
 import auth from '../utils/auth.js';
 
 const router = express.Router();

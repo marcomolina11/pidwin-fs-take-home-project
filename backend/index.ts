@@ -1,18 +1,16 @@
-import express, { Express } from 'express';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import userRouter from './src/api/user.js';
-import gameRouter from './src/api/game.js';
-import http from 'http';
+import { createServer } from 'http';
 import { Server } from 'socket.io';
+import dotenv from 'dotenv';
+import app from './src/app.js';
 import { startGameCycle, stopGameCycle } from './src/services/gameService.js';
+import MongoDbService from './src/services/mongoDbService.js';
 
 dotenv.config();
 
-const app: Express = express();
-const server = http.createServer(app);
+// Create HTTP server
+const server = createServer(app);
+
+// Initialize Socket.io
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
@@ -20,22 +18,16 @@ const io = new Server(server, {
   },
 });
 
-// Export io to use in other files
-export { io };
-
-app.use(bodyParser.json({ limit: '5mb' }));
-app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
-
-app.use(cors());
-app.use('/api/user', userRouter);
-app.use('/api/game', gameRouter);
-
 const PORT: string | number = process.env.PORT || 8000;
 
 server.listen(PORT, () => console.log(`Server Started On Port ${PORT}`));
 
-mongoose
-  .connect(process.env.MONGODB_URL || '')
+// Handling dependency through some IOC container would be ideal
+const dbService = new MongoDbService();
+const dbConnectionString = process.env.MONGODB_URL || '';
+
+dbService
+  .connect(dbConnectionString)
   .then(() => {
     console.log('Starting Game Cycle...');
     startGameCycle();
@@ -54,8 +46,8 @@ process.on('SIGINT', async () => {
     console.log('Socket.io connections closed');
 
     // Close MongoDB connection
-    mongoose.connection
-      .close(false)
+    dbService
+      .closeConnection()
       .then(() => {
         console.log('MongoDB connection closed');
 
@@ -83,3 +75,5 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM received, forcing exit');
   process.exit(1);
 });
+
+export { app, server, io };
