@@ -6,21 +6,15 @@ import {
   processBetsForGame,
 } from './gameService.js';
 
-// Mock models first
-jest.mock('../models/user.js');
-jest.mock('../models/bet.js');
+// Define mock functions inside the factory function
+jest.mock('../models/user.js', () => ({
+  findByIdAndUpdate: jest.fn(),
+}));
 
-// Import the mocked models
-import User from '../models/user.js';
-import Bet from '../models/bet.js';
-
-// Mock the specific methods we need
-const mockFindByIdAndUpdate = jest.fn();
-const mockFind = jest.fn();
-
-User.findByIdAndUpdate = mockFindByIdAndUpdate;
-Bet.find = mockFind;
-Bet.findByIdAndUpdate = mockFindByIdAndUpdate;
+jest.mock('../models/bet.js', () => ({
+  find: jest.fn(),
+  findByIdAndUpdate: jest.fn(),
+}));
 
 // Mocking the entire gameService to prevent starting game cycles
 jest.mock('./gameService', () => {
@@ -32,7 +26,21 @@ jest.mock('./gameService', () => {
   };
 });
 
+// Import the mocked models after mocking
+import User from '../models/user.js';
+import Bet from '../models/bet.js';
+
 describe('Game Service', () => {
+  // Setup direct references to the mocks for convenience
+  const mockUserFindByIdAndUpdate = User.findByIdAndUpdate as jest.Mock;
+  const mockBetFind = Bet.find as jest.Mock;
+  const mockBetFindByIdAndUpdate = Bet.findByIdAndUpdate as jest.Mock;
+
+  beforeEach(() => {
+    // Clear all mocks before each test
+    jest.clearAllMocks();
+  });
+
   describe('unbiasedDieRoll', () => {
     test('should return a number between 1 and 6', () => {
       // Run multiple rolls to verify the range
@@ -72,11 +80,11 @@ describe('Game Service', () => {
         highestWinStreak: 5,
         tokens: 100,
       };
-      mockFindByIdAndUpdate.mockResolvedValue(mockUser);
+      mockUserFindByIdAndUpdate.mockResolvedValue(mockUser);
 
       const result = await updateUserForWin('user123', 100);
 
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
+      expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith(
         'user123',
         {
           $inc: { tokens: 100, currentWinStreak: 1 },
@@ -88,16 +96,16 @@ describe('Game Service', () => {
     });
 
     test('should return null if no user is found', async () => {
-      mockFindByIdAndUpdate.mockResolvedValue(null);
+      mockUserFindByIdAndUpdate.mockResolvedValue(null);
 
       const result = await updateUserForWin('nonexistent', 100);
 
-      expect(mockFindByIdAndUpdate).toHaveBeenCalled();
+      expect(mockUserFindByIdAndUpdate).toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
     test('should handle errors and return null', async () => {
-      mockFindByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+      mockUserFindByIdAndUpdate.mockRejectedValue(new Error('Database error'));
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -127,11 +135,11 @@ describe('Game Service', () => {
         tokens: 100,
       };
 
-      mockFindByIdAndUpdate.mockResolvedValue(mockUser);
+      mockUserFindByIdAndUpdate.mockResolvedValue(mockUser);
 
       const result = await updateUserForLoss('user123');
 
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
+      expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith(
         'user123',
         { currentWinStreak: 0 },
         { new: true, projection: { password: 0 } }
@@ -141,16 +149,16 @@ describe('Game Service', () => {
     });
 
     test('should return null if user is not found', async () => {
-      mockFindByIdAndUpdate.mockResolvedValue(null);
+      mockUserFindByIdAndUpdate.mockResolvedValue(null);
 
       const result = await updateUserForLoss('nonexistent');
 
-      expect(mockFindByIdAndUpdate).toHaveBeenCalled();
+      expect(mockUserFindByIdAndUpdate).toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
     test('should handle errors and return null', async () => {
-      mockFindByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+      mockUserFindByIdAndUpdate.mockRejectedValue(new Error('Database error'));
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -169,11 +177,15 @@ describe('Game Service', () => {
   describe('processBetsForGame', () => {
     beforeEach(() => {
       jest.clearAllMocks();
+      // Reset mock implementations to defaults
+      mockBetFind.mockReset();
+      mockBetFindByIdAndUpdate.mockReset();
+      mockUserFindByIdAndUpdate.mockReset();
     });
 
     test('should return empty results when no bets are found and not log an error', async () => {
       // Mock Bet.find to return empty array
-      mockFind.mockResolvedValue([]);
+      mockBetFind.mockResolvedValue([]);
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -189,7 +201,28 @@ describe('Game Service', () => {
     });
 
     test('should handle errors and return empty results when bet update fails', async () => {
-      mockFindByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+      // Mock finding bets - this is required for the function to proceed to the update step
+      mockBetFind.mockResolvedValue([
+        {
+          _id: 'bet123',
+          user: 'user123',
+          game: 'game123',
+          amount: 50,
+          isLuckySeven: true,
+          result: 'pending',
+        },
+      ]);
+
+      // Mock the update to fail
+      mockBetFindByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+
+      // Mock user update to succeed (so error comes from bet update)
+      mockUserFindByIdAndUpdate.mockResolvedValue({
+        _id: 'user123',
+        name: 'Test User',
+        tokens: 150,
+        currentWinStreak: 1,
+      });
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
