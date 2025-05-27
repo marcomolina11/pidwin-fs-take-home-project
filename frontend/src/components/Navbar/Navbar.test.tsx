@@ -38,7 +38,7 @@ describe('Navbar Component', () => {
     typeof reactRedux.useSelector
   >;
   const mockDispatch = jest.fn();
-  const mockUseDispatch = reactRedux.useDispatch as jest.Mock;
+  const mockUseDispatch = reactRedux.useDispatch as unknown as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
