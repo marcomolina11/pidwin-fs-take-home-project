@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import { LoginRequest } from '../types/index.js';
+import { generateToken } from '../utils/jwtUtils.js';
 
 const login = async (req: Request, res: Response) => {
   const { email, password }: LoginRequest = req.body;
@@ -23,17 +23,8 @@ const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid Password' });
     }
 
-    const token = jwt.sign(
-      {
-        _id: existingUser._id,
-        name: existingUser.name,
-        email: existingUser.email,
-        password: existingUser.password,
-        tokens: existingUser.tokens,
-      },
-      'test',
-      { expiresIn: '1h' }
-    );
+    // Generate token using jwt utility
+    const token = generateToken(existingUser);
 
     res.status(200).json({ token });
   } catch (error) {

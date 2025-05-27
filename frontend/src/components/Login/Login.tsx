@@ -13,7 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { signup, login } from '../../actions/login';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import { styles } from './styles';
-import { SignupFormData, UserData } from '../../types/actionTypes';
+import { SignupFormData } from '../../types/actionTypes';
+import { UserData } from '../../types';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { useSelector } from 'react-redux';
@@ -28,11 +29,11 @@ const formDataInitVal: SignupFormData = {
 };
 
 const Login: React.FC = () => {
+  const user: UserData | null = useSelector(selectUser);
   const [formData, setFormData] = useState<SignupFormData>(formDataInitVal);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isExistingUser, setIsExsistingUser] = useState<boolean>(true);
 
-  const user: UserData | null = useSelector(selectUser);
   const history = useNavigate();
   const dispatch = useDispatch<ThunkDispatch<any, any, AnyAction>>();
 

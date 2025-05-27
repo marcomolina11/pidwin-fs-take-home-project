@@ -1,16 +1,59 @@
-import React from "react";
-import { Container } from "@mui/material";
-import { Route, BrowserRouter, Routes } from "react-router-dom";
-
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-import Navbar from "./components/Navbar/Navbar";
-import Login from "./components/Login/Login";
-import Home from "./components/Home/Home";
-import PasswordSetting from "./components/PasswordSettings/PasswordSettings";
+import React, { useEffect } from 'react';
+import { CircularProgress, Container } from '@mui/material';
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useDataRefresh } from './hooks/useDataRefresh';
+import Navbar from './components/Navbar/Navbar';
+import Login from './components/Login/Login';
+import Home from './components/Home/Home';
+import PasswordSetting from './components/PasswordSettings/PasswordSettings';
+import WinStreaks from './components/WinStreaks/WinStreaks';
+import socketService from './services/socketService';
+import { useSelector, useDispatch, useStore } from 'react-redux';
+import { selectIsAuthenticated } from './selectors/authSelectors';
+import { RootState } from './types/store';
+import { AnyAction } from 'redux';
+import { ThunkDispatch } from 'redux-thunk';
 
 const App: React.FC = () => {
+  const { loading } = useDataRefresh();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dispatch = useDispatch<ThunkDispatch<RootState, unknown, AnyAction>>();
+  const store = useStore<RootState>();
+
+  // Initialize socket when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      socketService.initialize(
+        dispatch as (action: AnyAction) => void,
+        store.getState
+      );
+    } else {
+      socketService.disconnect();
+    }
+
+    // Clean up socket on app unmount
+    return () => {
+      socketService.disconnect();
+    };
+  }, [isAuthenticated, dispatch, store]);
+
+  if (loading) {
+    return (
+      <Container
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Container>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Container maxWidth="lg">
@@ -30,6 +73,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Login />} />
           <Route path="/password" element={<PasswordSetting />} />
+          <Route path="/winStreaks" element={<WinStreaks />} />
         </Routes>
       </Container>
     </BrowserRouter>

@@ -11,10 +11,8 @@ interface StylesInterface {
   brandContainer: React.CSSProperties;
   purple: SxProps<Theme>;
   paper: SxProps<Theme>;
-  avatar: SxProps<Theme>;
-  form: React.CSSProperties;
-  submit: SxProps<Theme>;
-  typo: SxProps<Theme>;
+  game: SxProps<Theme>;
+  gameContainer: SxProps<Theme>;
 }
 
 export const styles: StylesInterface = {
@@ -54,24 +52,23 @@ export const styles: StylesInterface = {
     backgroundColor: deepPurple[500],
   },
   paper: {
-    marginTop: theme.spacing(2),
+    margin: '30px 0',
+    textAlign: 'center',
+    padding: '10px 20px',
+  },
+  game: {
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: theme.spacing(2),
+    justifyContent: 'center',
+    gap: '16px',
+    paddingLeft: 0,
+    paddingRight: 0,
+    maxWidth: '100%',
+    margin: 0,
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: '#673ab7',
-  },
-  form: {
+  gameContainer: {
     width: '100%',
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 1, 2),
-  },
-  typo: {
-    margin: theme.spacing(3, 3, 2),
+    display: 'flex',
+    justifyContent: 'center',
+    mt: 2,
   },
 };

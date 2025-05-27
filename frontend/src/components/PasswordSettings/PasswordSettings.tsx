@@ -36,7 +36,7 @@ const PasswordSetting: React.FC = () => {
   // Use ThunkDispatch instead of regular Dispatch
   const dispatch = useDispatch<ThunkDispatch<any, any, AnyAction>>();
 
-  const handleChangeC = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChangeFormData({ ...changeFormData, [e.target.name]: e.target.value });
   };
 
@@ -79,14 +79,14 @@ const PasswordSetting: React.FC = () => {
               <Input
                 name="oldPassword"
                 label="Current Password"
-                handleChange={handleChangeC}
+                handleChange={handleChange}
                 type={showPassword ? 'text' : 'password'}
                 handleShowPassword={handleShowPassword}
               />
               <Input
                 name="newPassword"
                 label="New Password"
-                handleChange={handleChangeC}
+                handleChange={handleChange}
                 type="password"
                 showBar={true}
                 passValue={changeFormData.newPassword}

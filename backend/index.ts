@@ -1,24 +1,85 @@
-import express, { Express } from 'express';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import dotenv from 'dotenv';
-import userRouter from './src/api/user.js';
+import app from './src/app.js';
+import { startGameCycle, stopGameCycle } from './src/services/gameService.js';
+import MongoDbService from './src/services/mongoDbService.js';
 
 dotenv.config();
 
-const app: Express = express();
-app.use(bodyParser.json({ limit: '5mb' }));
-app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
+// Create HTTP server
+const server = createServer(app);
 
-app.use(cors());
-app.use('/api/user', userRouter);
+// Initialize Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
 
 const PORT: string | number = process.env.PORT || 8000;
 
-mongoose
-  .connect(process.env.MONGODB_URL || '')
-  .then(() =>
-    app.listen(PORT, () => console.log(`Server Started On Port ${PORT}`))
-  )
-  .catch((error) => console.log(error.message));
+// ES Module compatible way to check if file is run directly without using import.meta
+const isMainModule = process.env.NODE_ENV !== 'test';
+
+// Only start the server if this file is run directly
+if (isMainModule) {
+  server.listen(PORT, () => console.log(`Server Started On Port ${PORT}`));
+
+  // Handling dependency through some IOC container would be ideal
+  const dbService = new MongoDbService();
+  const dbConnectionString = process.env.MONGODB_URL || '';
+
+  dbService
+    .connect(dbConnectionString)
+    .then(() => {
+      console.log('Starting Game Cycle...');
+      startGameCycle();
+    })
+    .catch((error) => console.log(error.message));
+
+  // Graceful shutdown handler
+  process.on('SIGINT', async () => {
+    console.log('Shutting down gracefully...');
+
+    // Stop the game cycle
+    stopGameCycle();
+
+    // Close all Socket.io connections
+    io.close(() => {
+      console.log('Socket.io connections closed');
+
+      // Close MongoDB connection
+      dbService
+        .closeConnection()
+        .then(() => {
+          console.log('MongoDB connection closed');
+
+          // Close the HTTP server with a timeout
+          const serverCloseTimeout = setTimeout(() => {
+            console.log('Server close timed out, forcing exit');
+            process.exit(1);
+          }, 3000);
+
+          server.close(() => {
+            clearTimeout(serverCloseTimeout);
+            console.log('Server closed');
+            process.exit(0);
+          });
+        })
+        .catch((err) => {
+          console.error('Error closing MongoDB connection:', err);
+          process.exit(1);
+        });
+    });
+  });
+}
+
+// Backup force exit handler for SIGTERM
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, forcing exit');
+  process.exit(1);
+});
+
+export { app, server, io };
