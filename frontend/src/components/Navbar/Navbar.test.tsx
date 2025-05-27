@@ -222,9 +222,6 @@ describe('Navbar Component', () => {
 
     renderWithRouter(<Navbar />);
 
-    // First render with initial token value
-    const tokenText = screen.getByText('Tokens: 100');
-
     // Change user token value
     const updatedUser = {
       ...initialUser,
