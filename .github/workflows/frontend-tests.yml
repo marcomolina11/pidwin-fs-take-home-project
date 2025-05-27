@@ -1,4 +1,4 @@
-name: Backend Tests
+name: Frontend Tests
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Run Backend Tests
+    name: Run Frontend Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -20,14 +20,14 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./backend
+        working-directory: ./frontend
         run: npm ci
 
       - name: Run tests
-        working-directory: ./backend
-        run: npm test
+        working-directory: ./frontend
+        run: npm test -- --watchAll=false
         env:
-          NODE_ENV: test
+          CI: true
